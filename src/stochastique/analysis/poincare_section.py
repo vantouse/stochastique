@@ -1,9 +1,10 @@
 import numpy as np
+from typing import Callable
 from scipy.integrate import solve_ivp
 from scipy.optimize import root
 
 
-def find_limit_cycle(model_func: callable, params: dict):
+def find_limit_cycle(model_func: Callable, params: dict) -> np.ndarray:
     """
     Find limit cycle in a 2D dynamic system using Poincare section.
     """

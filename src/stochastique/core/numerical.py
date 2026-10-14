@@ -1,16 +1,17 @@
 import numpy as np
 import scipy as sp
+from typing import Callable, Optional
 
 from stochastique.random.generators import RNG_DEFAULT
 
 
 def estimate_integral_mc(
-    func: callable,
+    func: Callable,
     x_bounds: tuple[float, float],
     y_bounds: tuple[float, float],
     sample_size: int,
     rng: np.random.Generator = RNG_DEFAULT,
-):
+) -> float:
     x_min, x_max = x_bounds
     y_min, y_max = y_bounds
 
@@ -25,7 +26,7 @@ def estimate_integral_mc(
 
 
 def find_jacobian(
-    func: callable,
+    func: Callable,
     t: float,
     state: np.ndarray,
     params: dict,
@@ -49,17 +50,26 @@ def find_jacobian(
 
 
 def find_equilibrium(
-    func: callable,
+    func: Callable,
     guess: np.ndarray,
     params: dict,
-) -> np.ndarray:    
+) -> Optional[np.ndarray]:
+    """
+    Numerically compute equilibrium point of a dynamical system using fsolve.
+    """
+    if guess is None or not np.all(np.isfinite(guess)):
+        return None
+
     def root_fn(state):
         return func(0, state, **params)
     
-    solution, info, ier, _ = sp.optimize.fsolve(root_fn, guess, full_output=True)
+    try:
+        solution, info, ier, _ = sp.optimize.fsolve(root_fn, guess, full_output=True)
+        if ier == 1 and np.all(np.isfinite(solution)):
+            return solution
+    except Exception:
+        pass
     
-    if ier == 1:
-        return solution
     return None
 
 
@@ -165,11 +175,11 @@ def solve_lyapunov_symmetric_2d(F: np.ndarray, Q: np.ndarray):
 
 
 def stochastic_sensitivity_matrix_2d(
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     equilibrium: np.ndarray,
     noise_mask: np.ndarray = np.array([1, 1]),
-):
+) -> np.ndarray:
     """
     Find stochastic sensitivity matrix `W` near the `equilibrium` point for a dynamic system given
     by `model_func` with parameter values `params`.

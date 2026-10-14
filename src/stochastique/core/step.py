@@ -1,15 +1,16 @@
 import numpy as np
+from typing import Callable
 
 
 def step_stochastic_em(
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     state: np.ndarray,
     dt: float,
     epsilon: float,
     noise_mask: np.ndarray = np.array([1, 1]),
     rng: np.random.Generator = np.random.default_rng(),
-):
+) -> np.ndarray:
     """
     Euler-Maruyama step for stochastic system given by `model_func` with `params`.
 
@@ -31,14 +32,14 @@ def step_stochastic_em(
 
 
 def step_stochastic_rk4(
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     state: np.ndarray,
     dt: float,
     epsilon: float,
     noise_mask: np.ndarray,
     rng: np.random.Generator,
-):
+) -> np.ndarray:
     """
     Runge-Kutta 4-th order step for stochastic system given by `model_func` with `params`.
 

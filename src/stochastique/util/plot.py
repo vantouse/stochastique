@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Callable, Tuple
 from tqdm import tqdm
 
 from stochastique.analysis.simulation import simulate_stochastic_cloud
@@ -8,9 +9,9 @@ from stochastique.core.numerical import compute_covariance_matrix_2d, stochastic
 
 def plot_eigenvalues_per_param_value(
     ax: plt.Axes,
-    model_func: callable,
+    model_func: Callable,
     params: dict,
-    equilibrium_func: callable,
+    equilibrium_func: Callable,
     param_name: str,
     param_values: np.ndarray,
     stable_range: tuple[float, float],
@@ -21,7 +22,7 @@ def plot_eigenvalues_per_param_value(
     empirical: bool = True,
     highlight: bool = True,
     verbose: bool = True,
-):
+) -> None:
     """
     Plot eigenvalues of the covariance matrix (or analytically derived stochastic sensitivity matrix) at
     different values `param_values` of a given parameter `param_name`.
@@ -37,18 +38,19 @@ def plot_eigenvalues_per_param_value(
     """
     lambda1_values = []
     lambda2_values = []
+    curr_params = params.copy()
 
     progress_bar = tqdm(param_values, desc='Compute eigenvalues per parameter value') if verbose else param_values
     
     for val in progress_bar:
-        params[param_name] = val
+        curr_params[param_name] = val
         equilibrium = equilibrium_func(val)
 
         if empirical:
             trajectories = simulate_stochastic_cloud(
                 ax=None,
                 model_func=model_func,
-                params=params,
+                params=curr_params,
                 state_init=equilibrium,
                 time_span=time_span,
                 epsilon=epsilon,
@@ -63,7 +65,7 @@ def plot_eigenvalues_per_param_value(
         else:
             matrix = stochastic_sensitivity_matrix_2d(
                 model_func=model_func,
-                params=params,
+                params=curr_params,
                 equilibrium=equilibrium,
                 noise_mask=noise_mask,
             )

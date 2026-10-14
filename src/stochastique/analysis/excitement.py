@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Callable, Tuple
 from tqdm import tqdm
 from kneed import find_shape, KneeLocator
 
@@ -7,7 +8,7 @@ from stochastique.analysis.simulation import simulate_trajectory
 
 
 def localize_stochastic_excitement(
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     state_init: np.ndarray,
     time_span: np.ndarray,
@@ -17,7 +18,7 @@ def localize_stochastic_excitement(
     rng: np.random.Generator = np.random.default_rng(),
     ax: plt.Axes = None,
     highlight: bool = True,
-):
+) -> Tuple[float, float]:
     """
     Empirically estimate epsilon-zones of stochastic excitement for a stochastic system given by
     `model_func` and `params`.

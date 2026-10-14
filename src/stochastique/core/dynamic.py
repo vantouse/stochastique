@@ -1,11 +1,9 @@
 """
-This file contains the main version of DynamicSystem2D with all the functionality used in lab 3.
-
-The `dynamic_system.py` is secondary, as it was created in attempt to decompose
-the functionality of DynamicSystem2D into narrower subclasses. It must be refactored ASAP.
+Core 2D dynamical system simulation and phase space analysis.
 """
 
 from itertools import product
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +16,7 @@ class DynamicSystem2D:
 
     def __init__(
         self,
-        model_func: callable,
+        model_func: Callable,
         params: dict = None,
     ) -> None:
         """
@@ -89,10 +87,11 @@ class DynamicSystem2D:
         param_used = []
         bifurcation_points = []
 
+        curr_params = self.params.copy()
         eigenvalues_last = None
 
         for val in param_values:
-            self.params[param_name] = val
+            curr_params[param_name] = val
 
             guess = self._resolve_state_init(
                 state_init=state_init,
@@ -103,7 +102,7 @@ class DynamicSystem2D:
             equilibrium = find_equilibrium(
                 func=self.model_func,
                 guess=guess,
-                params=self.params
+                params=curr_params
             )
 
             if equilibrium is None:
@@ -113,7 +112,7 @@ class DynamicSystem2D:
                 func=self.model_func,
                 t=0,
                 state=equilibrium,
-                params=self.params
+                params=curr_params
             )
             eigenvalues = np.linalg.eigvals(jacobian)
 
