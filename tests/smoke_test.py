@@ -2,8 +2,8 @@
 import numpy as np
 from pathlib import Path
 
-from stochastique.models.FHN import model_FHN, equilibria_FHN
-from stochastique.models.SN import model_SN, equilibria_SN
+from stochastique.models.FHN import model_FHN, equilibria_FHN, FitzHughNagumo
+from stochastique.models.SN import model_SN, equilibria_SN, SaltzmanNicolis
 from stochastique.core.solvers import TrajectorySolver
 from stochastique.analysis.simulation import simulate_trajectory
 from stochastique.core.numerical import find_jacobian, find_equilibrium, classify_equilibrium
@@ -25,6 +25,11 @@ def test_fhn_model() -> None:
     time_span = np.linspace(0, 10, 100)
     solution = solver.solve(state_init=eqs[0], time_span=time_span, params={"delta": 0.1, "a": 1.0})
     assert solution.shape == (100, 2), f"Expected solution shape (100, 2), got {solution.shape}"
+
+    # Test class-based model interface
+    fhn_model = FitzHughNagumo()
+    assert fhn_model.default_params["delta"] == 0.1
+    assert len(fhn_model.equilibria()) == 1
     print("FHN model test passed successfully.")
 
 
@@ -52,6 +57,11 @@ def test_sn_model() -> None:
         method="rk4"
     )
     assert trajectory.shape == (50, 2), f"Expected trajectory shape (50, 2), got {trajectory.shape}"
+
+    # Test class-based model interface
+    sn_model = SaltzmanNicolis()
+    assert sn_model.default_params["a"] == 1.0
+    assert len(sn_model.equilibria()) == 3
     print("SN model test passed successfully.")
 
 
