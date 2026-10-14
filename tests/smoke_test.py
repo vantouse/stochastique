@@ -7,6 +7,7 @@ from stochastique.models.SN import model_SN, equilibria_SN, SaltzmanNicolis
 from stochastique.core.solvers import TrajectorySolver
 from stochastique.analysis.simulation import simulate_trajectory
 from stochastique.core.numerical import find_jacobian, find_equilibrium, classify_equilibrium
+from stochastique.core.dynamic import DynamicSystem2D
 
 
 def test_fhn_model() -> None:
@@ -82,9 +83,22 @@ def test_numerical_routines() -> None:
     print("Numerical routines test passed successfully.")
 
 
+def test_dynamic_system() -> None:
+    """Test DynamicSystem2D facade."""
+    print("Testing DynamicSystem2D...")
+    sys = DynamicSystem2D(model_FHN, params={"delta": 0.1, "a": 1.0})
+    time_span = np.linspace(0, 5, 50)
+    eqs = equilibria_FHN(delta=0.1, a=1.0)
+    # Test DynamicSystem2D
+    solution = sys.solve(eqs[0], time_span)
+    assert solution.shape == (50, 2), f"Expected solution shape (50, 2), got {solution.shape}"
+    print("DynamicSystem2D test passed successfully.")
+
+
 if __name__ == "__main__":
     print("Starting smoke test suite...")
     test_fhn_model()
     test_sn_model()
     test_numerical_routines()
+    test_dynamic_system()
     print("All smoke tests passed successfully!")

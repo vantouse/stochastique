@@ -1,8 +1,5 @@
 """
-This file contains the main version of DynamicSystem2D with all the functionality used in lab 3.
-
-The `dynamic_system.py` is secondary, as it was created in attempt to decompose
-the functionality of DynamicSystem2D into narrower subclasses. It must be refactored ASAP.
+Core 2D dynamical system simulation and phase space analysis.
 """
 
 from itertools import product
