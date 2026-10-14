@@ -1,5 +1,6 @@
 # tests/smoke_test.py
 import numpy as np
+import matplotlib.pyplot as plt
 from pathlib import Path
 
 from stochastique.models.FHN import model_FHN, equilibria_FHN, FitzHughNagumo
@@ -8,6 +9,9 @@ from stochastique.core.solvers import TrajectorySolver
 from stochastique.analysis.simulation import simulate_trajectory
 from stochastique.core.numerical import find_jacobian, find_equilibrium, classify_equilibrium
 from stochastique.core.dynamic import DynamicSystem2D
+from stochastique.analysis.bifurcation import BifurcationAnalyzer
+from stochastique.analysis.limit_cycles import LimitCycleAnalyzer
+from stochastique.analysis.attraction import localize_basins_of_attraction
 
 
 def test_fhn_model() -> None:
@@ -95,10 +99,52 @@ def test_dynamic_system() -> None:
     print("DynamicSystem2D test passed successfully.")
 
 
+def test_analysis_modules() -> None:
+    """Test high-level analysis modules (Bifurcation, Limit Cycles, Basins)."""
+    print("Testing analysis modules...")
+    
+    # 1. Bifurcation Analyzer
+    bif = BifurcationAnalyzer(model_SN)
+    fig, ax = plt.subplots()
+    param_values = np.linspace(0.5, 1.5, 5)
+    bif_points, eq_arr = bif.plot_bifurcation_diagram(
+        param_name="a",
+        param_values=param_values,
+        state_init=lambda **kwargs: np.array([0.5, 0.5]),
+        ax=ax,
+        params={"a": 1.0, "b": 2.0}
+    )
+    plt.close(fig)
+    assert isinstance(bif_points, np.ndarray)
+
+    # 2. Limit Cycle Analyzer
+    lc_analyzer = LimitCycleAnalyzer(model_FHN)
+    time_span = np.linspace(0, 10, 100)
+    sol = lc_analyzer.solve(np.array([1.0, 1.0]), time_span, {"delta": 0.1, "a": 1.0})
+    crossings, ctimes = lc_analyzer.find_poincare_crossings(sol, time_span, x_section=0.0)
+    assert isinstance(crossings, np.ndarray)
+
+    # 3. Basins of Attraction
+    sys = DynamicSystem2D(model_SN, params={"a": 1.0, "b": 2.0})
+    eqs = equilibria_SN(a=1.0, b=2.0)
+    fig, ax = plt.subplots()
+    localize_basins_of_attraction(
+        system=sys,
+        equilibria=eqs[:2],
+        time_span=np.linspace(0, 5, 20),
+        ax=ax,
+        bounds=(-2, 2),
+        grid_size=5,
+    )
+    plt.close(fig)
+    print("Analysis modules test passed successfully.")
+
+
 if __name__ == "__main__":
     print("Starting smoke test suite...")
     test_fhn_model()
     test_sn_model()
     test_numerical_routines()
     test_dynamic_system()
+    test_analysis_modules()
     print("All smoke tests passed successfully!")
