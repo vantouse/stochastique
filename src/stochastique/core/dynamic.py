@@ -86,10 +86,11 @@ class DynamicSystem2D:
         param_used = []
         bifurcation_points = []
 
+        curr_params = self.params.copy()
         eigenvalues_last = None
 
         for val in param_values:
-            self.params[param_name] = val
+            curr_params[param_name] = val
 
             guess = self._resolve_state_init(
                 state_init=state_init,
@@ -100,7 +101,7 @@ class DynamicSystem2D:
             equilibrium = find_equilibrium(
                 func=self.model_func,
                 guess=guess,
-                params=self.params
+                params=curr_params
             )
 
             if equilibrium is None:
@@ -110,7 +111,7 @@ class DynamicSystem2D:
                 func=self.model_func,
                 t=0,
                 state=equilibrium,
-                params=self.params
+                params=curr_params
             )
             eigenvalues = np.linalg.eigvals(jacobian)
 

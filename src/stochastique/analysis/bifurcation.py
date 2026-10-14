@@ -26,17 +26,18 @@ class BifurcationAnalyzer:
         param_used = []
         bifurcation_points = []
 
+        curr_params = params.copy()
         eigenvalues_last = None
-        guess = state_init(**params)
+        guess = state_init(**curr_params)
 
         for val in param_values:
-            params[param_name] = val
+            curr_params[param_name] = val
 
-            eq = find_equilibrium(self.model_func, guess, params)
+            eq = find_equilibrium(self.model_func, guess, curr_params)
             if eq is None:
                 continue
 
-            J = find_jacobian(self.model_func, 0, eq, params)
+            J = find_jacobian(self.model_func, 0, eq, curr_params)
             evals = np.linalg.eigvals(J)
             eq_type = classify_equilibrium(evals)
 
