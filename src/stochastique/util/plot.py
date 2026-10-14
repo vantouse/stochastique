@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Callable, Tuple
 from tqdm import tqdm
 
 from stochastique.analysis.simulation import simulate_stochastic_cloud
@@ -8,9 +9,9 @@ from stochastique.core.numerical import compute_covariance_matrix_2d, stochastic
 
 def plot_eigenvalues_per_param_value(
     ax: plt.Axes,
-    model_func: callable,
+    model_func: Callable,
     params: dict,
-    equilibrium_func: callable,
+    equilibrium_func: Callable,
     param_name: str,
     param_values: np.ndarray,
     stable_range: tuple[float, float],
@@ -21,7 +22,7 @@ def plot_eigenvalues_per_param_value(
     empirical: bool = True,
     highlight: bool = True,
     verbose: bool = True,
-):
+) -> None:
     """
     Plot eigenvalues of the covariance matrix (or analytically derived stochastic sensitivity matrix) at
     different values `param_values` of a given parameter `param_name`.

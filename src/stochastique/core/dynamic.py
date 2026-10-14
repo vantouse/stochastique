@@ -3,6 +3,7 @@ Core 2D dynamical system simulation and phase space analysis.
 """
 
 from itertools import product
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +16,7 @@ class DynamicSystem2D:
 
     def __init__(
         self,
-        model_func: callable,
+        model_func: Callable,
         params: dict = None,
     ) -> None:
         """

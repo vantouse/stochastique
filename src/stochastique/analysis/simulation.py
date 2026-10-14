@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Callable, List
 from tqdm import tqdm
 
 from stochastique.core.step import step_stochastic_em, step_stochastic_rk4
 
 
 def simulate_trajectory(
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     state_init: np.ndarray,
     time_span: np.ndarray,
@@ -14,7 +15,7 @@ def simulate_trajectory(
     noise_mask: np.ndarray,
     rng: np.random.Generator,
     method: str = 'rk4',   # 'em' for Euler-Maruyama step
-):
+) -> np.ndarray:
     n = len(time_span)
     dt = time_span[1] - time_span[0]
     
@@ -44,7 +45,7 @@ def simulate_trajectory(
 
 def simulate_stochastic_cloud(
     ax: plt.Axes,
-    model_func: callable,
+    model_func: Callable,
     params: dict,
     time_span: np.ndarray,
     noise_mask: np.ndarray,
@@ -54,7 +55,7 @@ def simulate_stochastic_cloud(
     spread_init: float = 0.,
     use_scatter: bool = True,
     verbose: bool = True,
-):
+) -> List[np.ndarray]:
     rng = np.random.default_rng()
     trajectories = []
     
