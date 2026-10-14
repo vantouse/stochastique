@@ -37,11 +37,14 @@ class TrajectorySolver:
 
 
 def extract_limit_cycle(
-    solution: np.ndarray,
+    solution: np.ndarray | None,
     clip_ratio: float = 0.5,
     eps: float = 1e-5,
 ) -> np.ndarray | None:
     """Извлекает предельный цикл из траектории."""
+    if solution is None or len(solution) == 0:
+        return None
+
     clip = int(len(solution) * clip_ratio)
     ss = solution[clip:]
 

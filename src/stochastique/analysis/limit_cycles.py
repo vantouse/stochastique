@@ -94,15 +94,22 @@ class LimitCycleAnalyzer:
             return np.concatenate([residual, [phase_cond]])
 
         z0 = np.concatenate([guess_state, [guess_period]])
-        result = sp.optimize.root(objective, z0, method='hybr')
-
-        if not result.success:
+        try:
+            result = sp.optimize.root(objective, z0, method='hybr')
+            if not result.success or not np.all(np.isfinite(result.x)):
+                return None
+        except Exception:
             return None
 
         x0 = result.x[:2]
         T = result.x[2]
+        if T <= 0 or not np.all(np.isfinite(x0)):
+            return None
+
         time_span = np.linspace(0, T, 4000)
         trajectory = self.solve(x0, time_span, params)
+        if trajectory is None or not np.all(np.isfinite(trajectory)):
+            return None
 
         return x0, T, trajectory
 

@@ -53,14 +53,23 @@ def find_equilibrium(
     func: Callable,
     guess: np.ndarray,
     params: dict,
-) -> Optional[np.ndarray]:    
+) -> Optional[np.ndarray]:
+    """
+    Numerically compute equilibrium point of a dynamical system using fsolve.
+    """
+    if guess is None or not np.all(np.isfinite(guess)):
+        return None
+
     def root_fn(state):
         return func(0, state, **params)
     
-    solution, info, ier, _ = sp.optimize.fsolve(root_fn, guess, full_output=True)
+    try:
+        solution, info, ier, _ = sp.optimize.fsolve(root_fn, guess, full_output=True)
+        if ier == 1 and np.all(np.isfinite(solution)):
+            return solution
+    except Exception:
+        pass
     
-    if ier == 1:
-        return solution
     return None
 
 
